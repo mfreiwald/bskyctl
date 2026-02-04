@@ -1,0 +1,28 @@
+[project]
+name = "bskyctl"
+version = "0.1.0"
+description = "A pragmatic Bluesky (AT Protocol) CLI focused on automation (batch ops, safe throttling, facets)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Michael Freiwald" }]
+keywords = ["bluesky", "atproto", "cli"]
+dependencies = [
+  "atproto>=0.0.0",
+]
+
+[project.scripts]
+bskyctl = "bskyctl.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/michaelfreiwald/bskyctl"
+Repository = "https://github.com/michaelfreiwald/bskyctl"
+Issues = "https://github.com/michaelfreiwald/bskyctl/issues"
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E722"]
+
