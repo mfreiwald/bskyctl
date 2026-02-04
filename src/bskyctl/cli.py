@@ -217,6 +217,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Line format",
     )
     graph_export_p.add_argument(
+        "--plain",
+        action="store_true",
+        help="Write a plain newline-delimited list (no headers/sections). Best for piping into --list.",
+    )
+    graph_export_p.add_argument(
         "--progress-every",
         type=int,
         default=500,

@@ -121,24 +121,44 @@ def cmd_graph_export(args) -> None:
             progress_every=int(args.progress_every),
         )
 
-    lines: list[str] = []
-    lines.append("# bskyctl graph export")
-    lines.append(f"# actor: {actor}")
-    lines.append(f"# exportedAt: {exported_at}")
-    lines.append(f"# format: {mode}")
-    lines.append("")
+    if args.plain:
+        # Plain list output (no headers/sections). If both is selected, emit a
+        # de-duped union in stable order: followers first, then new entries from follows.
+        lines: list[str] = []
+        seen: set[str] = set()
 
-    if only in ("followers", "both"):
-        lines.append("[followers]")
-        lines.extend(followers)
-        lines.append("")
+        def add_many(xs: list[str]) -> None:
+            for x in xs:
+                if x in seen:
+                    continue
+                seen.add(x)
+                lines.append(x)
 
-    if only in ("follows", "both"):
-        lines.append("[follows]")
-        lines.extend(follows)
-        lines.append("")
+        if only in ("followers", "both"):
+            add_many(followers)
+        if only in ("follows", "both"):
+            add_many(follows)
 
-    atomic_write_lines(args.out, lines)
+        atomic_write_lines(args.out, lines)
+    else:
+        lines2: list[str] = []
+        lines2.append("# bskyctl graph export")
+        lines2.append(f"# actor: {actor}")
+        lines2.append(f"# exportedAt: {exported_at}")
+        lines2.append(f"# format: {mode}")
+        lines2.append("")
+
+        if only in ("followers", "both"):
+            lines2.append("[followers]")
+            lines2.extend(followers)
+            lines2.append("")
+
+        if only in ("follows", "both"):
+            lines2.append("[follows]")
+            lines2.extend(follows)
+            lines2.append("")
+
+        atomic_write_lines(args.out, lines2)
 
     parts: list[str] = []
     if only in ("followers", "both"):
