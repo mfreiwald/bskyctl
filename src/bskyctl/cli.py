@@ -12,6 +12,7 @@ import argparse
 from .commands.auth import cmd_accounts, cmd_login, cmd_logout, cmd_use, cmd_whoami
 from .commands.discover import cmd_notifications, cmd_search
 from .commands.feed import cmd_timeline
+from .commands.graph import cmd_graph
 from .commands.interactions import cmd_like, cmd_repost, cmd_unlike, cmd_unrepost
 from .commands.posts import cmd_delete, cmd_post, cmd_profile, cmd_quote
 from .commands.social import cmd_follow, cmd_unfollow
@@ -187,6 +188,41 @@ def build_parser() -> argparse.ArgumentParser:
     notif_p = subparsers.add_parser("notifications", aliases=["notif", "n"], help="Show notifications")
     notif_p.add_argument("-n", "--count", type=int, default=20, help="Number of notifications")
 
+    # graph
+    graph_p = subparsers.add_parser("graph", help="Graph ops (followers/follows)")
+    graph_sp = graph_p.add_subparsers(dest="graph_command")
+
+    graph_export_p = graph_sp.add_parser(
+        "export",
+        help="Export followers and follows of an actor to a text file",
+    )
+    graph_export_p.add_argument("actor", help="Handle (e.g. user.bsky.social) or DID")
+    graph_export_p.add_argument("--out", required=True, help="Output .txt file path")
+    graph_export_p.add_argument(
+        "--only",
+        choices=["both", "followers", "follows"],
+        default="both",
+        help="Which lists to export",
+    )
+    graph_export_p.add_argument(
+        "--limit",
+        type=int,
+        default=100,
+        help="Page size for API calls (max 100)",
+    )
+    graph_export_p.add_argument(
+        "--format",
+        choices=["handle", "did", "handle+did"],
+        default="handle",
+        help="Line format",
+    )
+    graph_export_p.add_argument(
+        "--progress-every",
+        type=int,
+        default=500,
+        help="Print progress every N items (0 disables)",
+    )
+
     return parser
 
 
@@ -231,6 +267,7 @@ def main(argv: list[str] | None = None) -> None:
         "notifications": cmd_notifications,
         "notif": cmd_notifications,
         "n": cmd_notifications,
+        "graph": cmd_graph,
     }
 
     if args.command in commands:
